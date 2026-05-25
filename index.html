@@ -2,8 +2,8 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voucher Generator - Boleh Edit Data Dalam Web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, print-scale: 1.0">
+    <title>Voucher Generator - Print Tanpa Header Footer</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -153,20 +153,83 @@
             min-width: 150px;
         }
         .add-row-form label { font-size: 12px; margin-bottom: 3px; }
-        .footer { text-align: center; color: white; margin-top: 30px; padding: 20px; }
+        
+        /* FOOTER WEB - HANYA NAMPAK DI WEB, TIDAK KETIKA PRINT */
+        .web-footer { 
+            text-align: center; 
+            color: white; 
+            margin-top: 30px; 
+            padding: 20px;
+        }
         
         @media (max-width: 768px) {
             .row { flex-direction: column; }
             .btn { width: 100%; margin-bottom: 10px; }
             .add-row-form { flex-direction: column; }
         }
+
+        /* PRINT STYLES: BUANG SEMUA ELEMEN YANG TIDAK PERLU, TERMASUK HEADER/FOOTER LAMAN WEB */
+        @media print {
+            /* Sembunyikan semua elemen yang bukan voucher container */
+            body > *:not(.voucher-container) {
+                display: none !important;
+            }
+            
+            /* Pastikan voucher container sahaja yang dipaparkan */
+            .voucher-container {
+                display: block !important;
+                position: relative !important;
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                top: 0 !important;
+                left: 0 !important;
+                overflow: visible !important;
+                box-shadow: none !important;
+            }
+            
+            /* Sembunyikan button "Print Voucher" dan "Tutup" di dalam modal semasa print */
+            .voucher-container .btn,
+            .voucher-container > div > div:first-child {
+                display: none !important;
+            }
+            
+            /* Hilangkan sebarang header, footer, url, timestamp automatik browser */
+            @page {
+                margin: 0.5in;
+                size: A4;
+            }
+            
+            /* Pastikan tiada header/footer tambahan dari browser */
+            body {
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+            
+            /* Voucher styling untuk print bersih */
+            .voucher {
+                margin: 0 auto;
+                padding: 20px;
+                box-shadow: none;
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
+            
+            /* Pastikan page break berfungsi dengan baik */
+            .voucher-container [style*="page-break-before"] {
+                page-break-before: always;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="web-header">
-            <h1>📄 Voucher Generator - Boleh Edit Data</h1>
-            <p>Upload Excel ➡️ Edit Data Terus dalam Web ➡️ Generate Voucher</p>
+            <h1>📄 Voucher Generator - Edit Data Dalam Web</h1>
+            <p>Upload Excel ➡️ Edit Data Terus dalam Web ➡️ Generate Voucher (Print Tanpa Header/Footer)</p>
         </div>
 
         <div class="card">
@@ -232,7 +295,7 @@
 
         <div class="button-group">
             <button class="btn btn-primary" onclick="generateAndShowVouchers()" style="padding: 15px 30px; font-size: 16px;">👁️ Preview Voucher</button>
-            <button class="btn btn-info" onclick="generateAndPrintVouchers()" style="padding: 15px 30px; font-size: 16px;">🖨️ Print / Save PDF</button>
+            <button class="btn btn-info" onclick="generateAndPrintVouchers()" style="padding: 15px 30px; font-size: 16px;">🖨️ Print / Save PDF (Tanpa Header/Footer)</button>
             <button class="btn btn-warning" onclick="clearAll()" style="padding: 15px 30px; font-size: 16px;">🗑️ Clear All</button>
         </div>
 
@@ -240,19 +303,22 @@
             ✅ Sedia. <br>
             ✏️ Klik pada mana-mana cell dalam table untuk edit data terus<br>
             ➕ Klik "Tambah Row Baru" untuk masukkan invoice baru<br>
-            ❌ Klik "Delete" untuk buang row yang tak perlu
+            ❌ Klik "Delete" untuk buang row yang tak perlu<br>
+            🖨️ Apabila print, **header web, footer web, button, URL, timestamp akan hilang** — hanya voucher bersih!
         </div>
 
-        <div class="footer">
-            <p>© 2024 Voucher Generator System | Edit data terus dalam web, pastu generate voucher</p>
+        <!-- Web Footer - hanya nampak di skrin, tidak akan muncul semasa print -->
+        <div class="web-footer">
+            <p>© 2024 Voucher Generator System | Edit data terus dalam web, pastu generate voucher | Print tanpa header/footer</p>
         </div>
     </div>
 
-    <!-- Modal untuk voucher -->
+    <!-- Modal untuk voucher - tiada header/footer tambahan semasa print -->
     <div id="voucherModal" class="voucher-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; padding: 20px;">
         <div style="max-width: 900px; margin: 20px auto; background: white; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-            <div style="position: sticky; top: 10px; text-align: right; padding: 10px; background: white;">
-                <button class="btn btn-info" onclick="printVoucher()">🖨️ Print Voucher</button>
+            <!-- Butang kawalan hanya nampak di skrin, tidak di print -->
+            <div style="position: sticky; top: 10px; text-align: right; padding: 10px; background: white; z-index: 10;">
+                <button class="btn btn-info" onclick="printVoucher()">🖨️ Print Voucher (Tanpa Header/Footer)</button>
                 <button class="btn btn-danger" onclick="closeVoucher()">✖️ Tutup</button>
             </div>
             <div id="voucherContent" style="padding: 40px;"></div>
@@ -260,6 +326,26 @@
     </div>
 
     <style>
+        /* Style untuk voucher bersih */
+        .voucher {
+            background: white;
+            padding: 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        .voucher-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #333; }
+        .voucher-header h1 { font-size: 24px; margin: 0; }
+        .voucher-info { margin-bottom: 30px; border: 1px solid #333; padding: 15px; background: #fafafa; }
+        .info-row { margin-bottom: 10px; font-size: 12px; }
+        .info-label { font-weight: bold; display: inline-block; width: 120px; }
+        .voucher-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .voucher-table th, .voucher-table td { border: 1px solid #000; padding: 8px; font-size: 11px; vertical-align: top; }
+        .voucher-table th { background: #f0f0f0; text-align: center; font-weight: bold; }
+        .voucher-table td.text-right { text-align: right; }
+        .voucher-footer { margin-top: 40px; text-align: center; font-size: 10px; border-top: 1px solid #ccc; padding-top: 20px; }
+        
+        /* Hanya untuk paparan modal */
         .voucher-container {
             display: none;
             position: fixed;
@@ -272,26 +358,70 @@
             overflow-y: auto;
             padding: 20px;
         }
-        .voucher {
-            background: white;
-            padding: 40px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .voucher-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #333; }
-        .voucher-header h1 { font-size: 24px; }
-        .voucher-info { margin-bottom: 30px; border: 1px solid #333; padding: 15px; }
-        .info-row { margin-bottom: 10px; font-size: 12px; }
-        .info-label { font-weight: bold; display: inline-block; width: 120px; }
-        .voucher-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .voucher-table th, .voucher-table td { border: 1px solid #000; padding: 8px; font-size: 11px; }
-        .voucher-table th { background: #f0f0f0; text-align: center; }
-        .voucher-table td.text-right { text-align: right; }
-        .voucher-footer { margin-top: 40px; text-align: center; font-size: 10px; border-top: 1px solid #ccc; padding-top: 20px; }
+        
+        /* Print override - pastikan tiada langsung elemen luar */
         @media print {
-            body > *:not(.voucher-container) { display: none; }
-            .voucher-container { display: block !important; position: relative; background: white; padding: 0; }
-            .voucher-container > div { box-shadow: none; margin: 0; }
-            .voucher-container .btn { display: none; }
+            /* Sembunyikan semua elemen body selain voucher-container */
+            body * {
+                visibility: hidden;
+            }
+            body .voucher-container,
+            body .voucher-container * {
+                visibility: visible;
+            }
+            .voucher-container {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                background: white !important;
+                display: block !important;
+                overflow: visible !important;
+                box-shadow: none !important;
+            }
+            .voucher-container > div {
+                margin: 0 auto !important;
+                box-shadow: none !important;
+                max-width: 100% !important;
+                background: white !important;
+            }
+            /* Sembunyikan semua butang dalam modal semasa print */
+            .voucher-container .btn,
+            .voucher-container button,
+            .voucher-container > div > div:first-child {
+                display: none !important;
+            }
+            /* Pastikan voucher content kelihatan penuh */
+            #voucherContent {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .voucher {
+                padding: 0.2in;
+                margin: 0;
+                page-break-after: avoid;
+            }
+            /* Elak page break dalam tengah voucher */
+            .voucher {
+                page-break-inside: avoid;
+            }
+            /* Pastikan page break untuk multiple voucher */
+            [style*="page-break-before"] {
+                page-break-before: always;
+            }
+            @page {
+                margin: 0.4in;
+                size: A4;
+            }
+            /* Hilangkan sebarang header/footer automatik browser */
+            html, body {
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
         }
     </style>
 
@@ -370,7 +500,6 @@
             html += '</tbody></table>';
             container.innerHTML = html;
             
-            // Add click event listeners to editable cells
             document.querySelectorAll('.editable').forEach(cell => {
                 cell.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -557,11 +686,13 @@
                     <table class="voucher-table">
                         <thead><tr><th>Bil.</th><th>No. Invoice</th><th>Perkara</th><th>Jumlah (RM)</th></tr></thead>
                         <tbody>${rowsHTML}</tbody>
-                        <tfoot><tr><td colspan="3" style="text-align: right; font-weight: bold;">JUMLAH:</td><td style="text-align: right; font-weight: bold;">${formatNumber(totalAmount)}</td></tr></tfoot>
-                    </table>
+                        <tfoot><tr><td colspan="3" style="text-align: right; font-weight: bold;">JUMLAH:</td><td style="text-align: right; font-weight: bold;">${formatNumber(totalAmount)}</td></tr>
+                    </tfoot>
+                </table>
                     <div class="voucher-footer">
                         <p>Disediakan oleh: _________________________</p>
-                        <p>*** Sijil ini dijana secara automatik ***</p>
+                        <p>*** Voucher ini dijana secara automatik ***</p>
+                        <p style="font-size: 8px;">Tiada header/footer semasa print - voucher bersih</p>
                     </div>
                 </div>
             `;
@@ -613,7 +744,7 @@
                 
                 document.getElementById('voucherContent').innerHTML = allVouchersHTML;
                 document.getElementById('voucherModal').style.display = 'block';
-                updateStatus(`✅ ${voucherCount} voucher berjaya dijana.`, "success");
+                updateStatus(`✅ ${voucherCount} voucher berjaya dijana. Apabila print, header/footer web akan hilang sepenuhnya.`, "success");
                 
             } catch (error) {
                 updateStatus(`❌ GAGAL: ${error.message}`, "error");
@@ -625,8 +756,13 @@
             setTimeout(() => { printVoucher(); }, 500);
         }
 
-        function printVoucher() { window.print(); }
-        function closeVoucher() { document.getElementById('voucherModal').style.display = 'none'; }
+        function printVoucher() { 
+            window.print(); 
+        }
+        
+        function closeVoucher() { 
+            document.getElementById('voucherModal').style.display = 'none'; 
+        }
 
         function updateStatus(message, type) {
             const statusDiv = document.getElementById('status');
@@ -647,7 +783,6 @@
             updateStatus("✅ Semua telah dibersihkan.", "info");
         }
 
-        // Set tarikh default
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('voucherDate').value = today;
     </script>
