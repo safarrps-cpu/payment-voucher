@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, print-scale: 1.0">
-    <title>Voucher Generator - Print Tanpa Header Footer</title>
+    <title>Voucher Generator - Edit & Delete Row Berfungsi</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -32,6 +32,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 500; color: #555; }
@@ -91,7 +93,7 @@
         /* Table editable styles */
         .data-table-container {
             overflow-x: auto;
-            max-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -103,7 +105,7 @@
         }
         .editable-table th, .editable-table td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px 8px;
             text-align: left;
         }
         .editable-table th {
@@ -113,48 +115,51 @@
             top: 0;
             z-index: 10;
         }
-        .editable-table td.editable {
+        .editable-table td.editable-cell {
             background-color: #fff9e6;
             cursor: pointer;
         }
-        .editable-table td.editable:hover {
+        .editable-table td.editable-cell:hover {
             background-color: #fff3bf;
         }
         .editable-table input {
             width: 100%;
-            padding: 5px;
-            border: 1px solid #667eea;
+            padding: 6px;
+            border: 2px solid #667eea;
             border-radius: 4px;
             font-size: 13px;
+            outline: none;
         }
-        .delete-btn {
+        .delete-row-btn {
             background: #dc3545;
             color: white;
             border: none;
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
+            font-weight: bold;
         }
-        .delete-btn:hover { background: #c82333; }
-        .add-row-form {
+        .delete-row-btn:hover { background: #c82333; transform: scale(1.02); }
+        
+        .add-row-panel {
             margin-top: 15px;
             padding: 15px;
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-radius: 8px;
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
             align-items: flex-end;
         }
-        .add-row-form .form-group {
+        .add-row-panel .form-group {
             margin-bottom: 0;
             flex: 1;
-            min-width: 150px;
+            min-width: 160px;
         }
-        .add-row-form label { font-size: 12px; margin-bottom: 3px; }
+        .add-row-panel label { font-size: 12px; margin-bottom: 3px; color: #495057; font-weight: 600; }
+        .add-row-panel input { font-size: 13px; padding: 8px; }
         
-        /* FOOTER WEB - HANYA NAMPAK DI WEB, TIDAK KETIKA PRINT */
         .web-footer { 
             text-align: center; 
             color: white; 
@@ -165,71 +170,33 @@
         @media (max-width: 768px) {
             .row { flex-direction: column; }
             .btn { width: 100%; margin-bottom: 10px; }
-            .add-row-form { flex-direction: column; }
+            .add-row-panel { flex-direction: column; }
         }
 
-        /* PRINT STYLES: BUANG SEMUA ELEMEN YANG TIDAK PERLU, TERMASUK HEADER/FOOTER LAMAN WEB */
         @media print {
-            /* Sembunyikan semua elemen yang bukan voucher container */
-            body > *:not(.voucher-container) {
-                display: none !important;
-            }
-            
-            /* Pastikan voucher container sahaja yang dipaparkan */
+            body > *:not(.voucher-container) { display: none !important; }
             .voucher-container {
                 display: block !important;
                 position: relative !important;
                 background: white !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                width: 100% !important;
-                height: auto !important;
-                top: 0 !important;
-                left: 0 !important;
-                overflow: visible !important;
-                box-shadow: none !important;
             }
-            
-            /* Sembunyikan button "Print Voucher" dan "Tutup" di dalam modal semasa print */
             .voucher-container .btn,
-            .voucher-container > div > div:first-child {
+            .voucher-container button {
                 display: none !important;
             }
-            
-            /* Hilangkan sebarang header, footer, url, timestamp automatik browser */
-            @page {
-                margin: 0.5in;
-                size: A4;
-            }
-            
-            /* Pastikan tiada header/footer tambahan dari browser */
-            body {
-                margin: 0;
-                padding: 0;
-                background: white;
-            }
-            
-            /* Voucher styling untuk print bersih */
-            .voucher {
-                margin: 0 auto;
-                padding: 20px;
-                box-shadow: none;
-                page-break-after: avoid;
-                page-break-inside: avoid;
-            }
-            
-            /* Pastikan page break berfungsi dengan baik */
-            .voucher-container [style*="page-break-before"] {
-                page-break-before: always;
-            }
+            @page { margin: 0.5in; size: A4; }
+            body { margin: 0; padding: 0; background: white; }
+            .voucher { padding: 20px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="web-header">
-            <h1>📄 Voucher Generator - Edit Data Dalam Web</h1>
-            <p>Upload Excel ➡️ Edit Data Terus dalam Web ➡️ Generate Voucher (Print Tanpa Header/Footer)</p>
+            <h1>📄 Voucher Generator - Edit & Delete Row</h1>
+            <p>✅ Klik pada mana-mana cell untuk edit | 🗑️ Klik Delete untuk buang row | ➕ Tambah row baru dengan form khas</p>
         </div>
 
         <div class="card">
@@ -282,43 +249,61 @@
 
         <div class="card">
             <div class="card-title">
-                <span>5. ✏️ Edit Data Invoice (Klik pada cell untuk edit)</span>
-                <span>
-                    <button class="btn btn-success btn-sm" onclick="addNewRow()">➕ Tambah Row Baru</button>
-                    <button class="btn btn-info btn-sm" onclick="refreshTable()">🔄 Refresh Table</button>
-                </span>
+                <span>5. ✏️ Edit Data Invoice (Klik pada cell untuk edit | Klik Delete untuk padam row)</span>
+                <button class="btn btn-success btn-sm" onclick="openAddRowForm()">➕ Tambah Row Baru (Form)</button>
             </div>
             <div id="editableTableContainer" class="data-table-container">
                 <p style="text-align: center; padding: 40px; color: #999;">📂 Muat naik fail data untuk mula edit</p>
+            </div>
+            
+            <!-- Add Row Form - khas untuk tambah row baru -->
+            <div id="addRowForm" class="add-row-panel" style="display: none;">
+                <div class="form-group">
+                    <label>📄 No. Invoice</label>
+                    <input type="text" id="newInvoiceNo" placeholder="cth: INV-001" value="INV-NEW">
+                </div>
+                <div class="form-group">
+                    <label>📝 Perkara (Description)</label>
+                    <input type="text" id="newDescription" placeholder="Description" value="Description Baru">
+                </div>
+                <div class="form-group">
+                    <label>🏢 Pembekal (Supplier)</label>
+                    <input type="text" id="newSupplier" placeholder="Nama pembekal" value="Pembekal Baru">
+                </div>
+                <div class="form-group">
+                    <label>💰 Jumlah (RM)</label>
+                    <input type="number" id="newAmount" step="0.01" value="0.00">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" onclick="addNewRowFromForm()">✅ Tambah Row</button>
+                    <button class="btn btn-secondary" onclick="closeAddRowForm()" style="background:#6c757d; color:white;">❌ Batal</button>
+                </div>
             </div>
         </div>
 
         <div class="button-group">
             <button class="btn btn-primary" onclick="generateAndShowVouchers()" style="padding: 15px 30px; font-size: 16px;">👁️ Preview Voucher</button>
-            <button class="btn btn-info" onclick="generateAndPrintVouchers()" style="padding: 15px 30px; font-size: 16px;">🖨️ Print / Save PDF (Tanpa Header/Footer)</button>
+            <button class="btn btn-info" onclick="generateAndPrintVouchers()" style="padding: 15px 30px; font-size: 16px;">🖨️ Print / Save PDF</button>
             <button class="btn btn-warning" onclick="clearAll()" style="padding: 15px 30px; font-size: 16px;">🗑️ Clear All</button>
         </div>
 
         <div id="status" class="status status-info">
             ✅ Sedia. <br>
-            ✏️ Klik pada mana-mana cell dalam table untuk edit data terus<br>
-            ➕ Klik "Tambah Row Baru" untuk masukkan invoice baru<br>
-            ❌ Klik "Delete" untuk buang row yang tak perlu<br>
-            🖨️ Apabila print, **header web, footer web, button, URL, timestamp akan hilang** — hanya voucher bersih!
+            ✏️ **Klik pada mana-mana cell** dalam table untuk edit data terus<br>
+            🗑️ **Klik Delete** untuk buang row yang tak perlu<br>
+            ➕ **Klik "Tambah Row Baru (Form)"** untuk masukkan invoice baru dengan lengkap
         </div>
 
-        <!-- Web Footer - hanya nampak di skrin, tidak akan muncul semasa print -->
         <div class="web-footer">
-            <p>© 2024 Voucher Generator System | Edit data terus dalam web, pastu generate voucher | Print tanpa header/footer</p>
+            <p>© 2025 Voucher Generator System | Edit & Delete Row Berfungsi Sepenuhnya | Print Tanpa Header/Footer</p>
         </div>
     </div>
 
-    <!-- Modal untuk voucher - tiada header/footer tambahan semasa print -->
+    <!-- Modal Voucher -->
     <div id="voucherModal" class="voucher-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; padding: 20px;">
         <div style="max-width: 900px; margin: 20px auto; background: white; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-            <!-- Butang kawalan hanya nampak di skrin, tidak di print -->
-            <div style="position: sticky; top: 10px; text-align: right; padding: 10px; background: white; z-index: 10;">
-                <button class="btn btn-info" onclick="printVoucher()">🖨️ Print Voucher (Tanpa Header/Footer)</button>
+            <div style="position: sticky; top: 10px; text-align: right; padding: 10px; background: white;">
+                <button class="btn btn-info" onclick="printVoucher()">🖨️ Print Voucher</button>
                 <button class="btn btn-danger" onclick="closeVoucher()">✖️ Tutup</button>
             </div>
             <div id="voucherContent" style="padding: 40px;"></div>
@@ -326,112 +311,31 @@
     </div>
 
     <style>
-        /* Style untuk voucher bersih */
         .voucher {
             background: white;
             padding: 30px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 100%;
-            margin: 0 auto;
         }
         .voucher-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #333; }
-        .voucher-header h1 { font-size: 24px; margin: 0; }
-        .voucher-info { margin-bottom: 30px; border: 1px solid #333; padding: 15px; background: #fafafa; }
+        .voucher-header h1 { font-size: 24px; }
+        .voucher-info { margin-bottom: 30px; border: 1px solid #333; padding: 15px; }
         .info-row { margin-bottom: 10px; font-size: 12px; }
         .info-label { font-weight: bold; display: inline-block; width: 120px; }
         .voucher-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .voucher-table th, .voucher-table td { border: 1px solid #000; padding: 8px; font-size: 11px; vertical-align: top; }
-        .voucher-table th { background: #f0f0f0; text-align: center; font-weight: bold; }
-        .voucher-table td.text-right { text-align: right; }
+        .voucher-table th, .voucher-table td { border: 1px solid #000; padding: 8px; font-size: 11px; }
+        .voucher-table th { background: #f0f0f0; }
         .voucher-footer { margin-top: 40px; text-align: center; font-size: 10px; border-top: 1px solid #ccc; padding-top: 20px; }
-        
-        /* Hanya untuk paparan modal */
-        .voucher-container {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            overflow-y: auto;
-            padding: 20px;
-        }
-        
-        /* Print override - pastikan tiada langsung elemen luar */
-        @media print {
-            /* Sembunyikan semua elemen body selain voucher-container */
-            body * {
-                visibility: hidden;
-            }
-            body .voucher-container,
-            body .voucher-container * {
-                visibility: visible;
-            }
-            .voucher-container {
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                width: 100% !important;
-                height: auto !important;
-                background: white !important;
-                display: block !important;
-                overflow: visible !important;
-                box-shadow: none !important;
-            }
-            .voucher-container > div {
-                margin: 0 auto !important;
-                box-shadow: none !important;
-                max-width: 100% !important;
-                background: white !important;
-            }
-            /* Sembunyikan semua butang dalam modal semasa print */
-            .voucher-container .btn,
-            .voucher-container button,
-            .voucher-container > div > div:first-child {
-                display: none !important;
-            }
-            /* Pastikan voucher content kelihatan penuh */
-            #voucherContent {
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            .voucher {
-                padding: 0.2in;
-                margin: 0;
-                page-break-after: avoid;
-            }
-            /* Elak page break dalam tengah voucher */
-            .voucher {
-                page-break-inside: avoid;
-            }
-            /* Pastikan page break untuk multiple voucher */
-            [style*="page-break-before"] {
-                page-break-before: always;
-            }
-            @page {
-                margin: 0.4in;
-                size: A4;
-            }
-            /* Hilangkan sebarang header/footer automatik browser */
-            html, body {
-                margin: 0;
-                padding: 0;
-                background: white;
-            }
-        }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
     </style>
 
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script>
-        let rawData = [];
+        let rawData = [];      // Main data array
         let suppliers = [];
         let selectedSuppliers = new Set();
-        let editingCell = null;
 
+        // ======================== CORE FUNCTIONS ========================
         function processDataFile(input) {
             const file = input.files[0];
             if (!file) return;
@@ -460,7 +364,7 @@
                 
                 updateStatus(`✅ ${rawData.length} rekod ditemui. Klik pada cell untuk edit data.`, "success");
                 refreshSupplierList();
-                refreshTable();
+                renderTable(); // Guna renderTable yang baru
                 
                 if (!document.getElementById('voucherDate').value) {
                     const today = new Date().toISOString().split('T')[0];
@@ -470,119 +374,183 @@
             reader.readAsArrayBuffer(file);
         }
 
-        function refreshTable() {
+        // RENDER TABLE dengan event binding yang betul
+        function renderTable() {
             const container = document.getElementById('editableTableContainer');
-            if (rawData.length === 0) {
+            if (!rawData.length) {
                 container.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">📂 Tiada data. Muat naik fail atau tambah row baru.</p>';
                 return;
             }
             
             let html = '<table class="editable-table"><thead><tr>';
-            html += '<th>Bil.</th>';
-            html += '<th>No. Invoice</th>';
-            html += '<th>Perkara (Description)</th>';
-            html += '<th>Pembekal (Supplier)</th>';
-            html += '<th>Jumlah (RM)</th>';
-            html += '<th style="width: 60px;">Tindakan</th>';
+            html += '<th>Bil.</th><th>No. Invoice</th><th>Perkara (Description)</th><th>Pembekal (Supplier)</th><th>Jumlah (RM)</th><th style="width: 80px;">Tindakan</th>';
             html += '</tr></thead><tbody>';
             
             rawData.forEach((item, idx) => {
-                html += `<tr data-id="${item.id}">
+                html += `<tr data-row-id="${item.id}">
                     <td>${idx + 1}</td>
-                    <td class="editable" data-field="invoiceNo" data-id="${item.id}">${escapeHtml(item.invoiceNo)}</td>
-                    <td class="editable" data-field="description" data-id="${item.id}">${escapeHtml(item.description)}</td>
-                    <td class="editable" data-field="supplier" data-id="${item.id}">${escapeHtml(item.supplier)}</td>
-                    <td class="editable" data-field="amount" data-id="${item.id}" style="text-align: right;">${formatNumber(item.amount)}</td>
-                    <td style="text-align: center;"><button class="delete-btn" onclick="deleteRow('${item.id}')">🗑️ Delete</button></td>
+                    <td class="editable-cell" data-field="invoiceNo" data-id="${item.id}">${escapeHtml(item.invoiceNo || '')}</td>
+                    <td class="editable-cell" data-field="description" data-id="${item.id}">${escapeHtml(item.description || '')}</td>
+                    <td class="editable-cell" data-field="supplier" data-id="${item.id}">${escapeHtml(item.supplier || '')}</td>
+                    <td class="editable-cell" data-field="amount" data-id="${item.id}" style="text-align: right;">${formatNumber(item.amount)}</td>
+                    <td style="text-align: center;"><button class="delete-row-btn" data-id="${item.id}">🗑️ Delete</button></td>
                 </tr>`;
             });
             
             html += '</tbody></table>';
             container.innerHTML = html;
             
-            document.querySelectorAll('.editable').forEach(cell => {
-                cell.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    makeEditable(this);
-                });
+            // Attach event listeners untuk editable cells
+            document.querySelectorAll('.editable-cell').forEach(cell => {
+                cell.removeEventListener('click', handleCellClick);
+                cell.addEventListener('click', handleCellClick);
+            });
+            
+            // Attach event listeners untuk delete buttons
+            document.querySelectorAll('.delete-row-btn').forEach(btn => {
+                btn.removeEventListener('click', handleDeleteClick);
+                btn.addEventListener('click', handleDeleteClick);
             });
         }
         
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
+        function handleCellClick(e) {
+            e.stopPropagation();
+            const cell = e.currentTarget;
+            makeEditable(cell);
         }
-
+        
+        function handleDeleteClick(e) {
+            e.stopPropagation();
+            const btn = e.currentTarget;
+            const id = btn.getAttribute('data-id');
+            if (id && confirm('⚠️ Padam rekod ini? Tindakan ini tetap.')) {
+                deleteRowById(id);
+            }
+        }
+        
+        function deleteRowById(id) {
+            rawData = rawData.filter(item => item.id != id);
+            renderTable();
+            refreshSupplierList();
+            updateStatus(`✅ Rekod berjaya dipadam.`, "success");
+        }
+        
         function makeEditable(cell) {
             if (cell.querySelector('input')) return;
             
             const field = cell.dataset.field;
             const id = cell.dataset.id;
-            const currentValue = cell.innerText;
+            const currentText = cell.innerText.trim();
             
-            const input = document.createElement('input');
-            input.type = field === 'amount' ? 'number' : 'text';
-            input.step = '0.01';
-            input.value = field === 'amount' ? parseFloat(currentValue.replace(/,/g, '')) || 0 : currentValue;
+            let input;
+            if (field === 'amount') {
+                input = document.createElement('input');
+                input.type = 'number';
+                input.step = '0.01';
+                const rawValue = currentText.replace(/,/g, '');
+                input.value = parseFloat(rawValue) || 0;
+            } else {
+                input = document.createElement('input');
+                input.type = 'text';
+                input.value = currentText;
+            }
+            
             input.style.width = '100%';
             input.style.padding = '5px';
+            input.style.border = '2px solid #28a745';
+            input.style.borderRadius = '4px';
             
             cell.innerHTML = '';
             cell.appendChild(input);
             input.focus();
             
-            input.addEventListener('blur', function() {
-                saveEdit(cell, field, id, input.value);
-            });
-            
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    saveEdit(cell, field, id, input.value);
+            const saveHandler = () => {
+                let newValue = input.value;
+                if (field === 'amount') {
+                    newValue = parseFloat(newValue);
+                    if (isNaN(newValue)) newValue = 0;
                 }
-            });
+                updateCellValue(id, field, newValue);
+                cell.removeEventListener('blur', saveHandler);
+                cell.removeEventListener('keypress', keyHandler);
+            };
+            
+            const keyHandler = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveHandler();
+                }
+            };
+            
+            input.addEventListener('blur', saveHandler);
+            input.addEventListener('keypress', keyHandler);
         }
         
-        function saveEdit(cell, field, id, newValue) {
+        function updateCellValue(id, field, newValue) {
             const item = rawData.find(i => i.id == id);
             if (item) {
                 if (field === 'amount') {
-                    let num = parseFloat(newValue);
-                    item.amount = isNaN(num) ? 0 : num;
+                    item.amount = parseFloat(newValue) || 0;
                 } else {
-                    item[field] = newValue;
+                    item[field] = newValue.toString();
                 }
-                refreshTable();
+                renderTable();
                 refreshSupplierList();
-                updateStatus(`✅ Data berjaya dikemaskini.`, "success");
+                updateStatus(`✅ Data berjaya dikemaskini: ${field} = ${field === 'amount' ? formatNumber(item.amount) : newValue}`, "success");
             }
         }
         
-        function deleteRow(id) {
-            if (confirm('Padam rekod ini?')) {
-                rawData = rawData.filter(item => item.id != id);
-                refreshTable();
-                refreshSupplierList();
-                updateStatus(`✅ Rekod dipadam.`, "success");
+        function openAddRowForm() {
+            const form = document.getElementById('addRowForm');
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'flex';
+                // Reset fields
+                document.getElementById('newInvoiceNo').value = 'INV-' + Math.floor(Math.random() * 1000);
+                document.getElementById('newDescription').value = 'Deskripsi baru';
+                document.getElementById('newSupplier').value = 'Pembekal Baru';
+                document.getElementById('newAmount').value = '0.00';
+            } else {
+                form.style.display = 'none';
             }
         }
         
-        function addNewRow() {
+        function closeAddRowForm() {
+            document.getElementById('addRowForm').style.display = 'none';
+        }
+        
+        function addNewRowFromForm() {
+            const invoiceNo = document.getElementById('newInvoiceNo').value.trim();
+            const description = document.getElementById('newDescription').value.trim();
+            const supplier = document.getElementById('newSupplier').value.trim();
+            let amount = parseFloat(document.getElementById('newAmount').value);
+            if (isNaN(amount)) amount = 0;
+            
+            if (!supplier) {
+                updateStatus("⚠️ Sila masukkan nama pembekal.", "error");
+                return;
+            }
+            
             const newId = Date.now() + Math.random();
             rawData.push({
                 id: newId,
-                supplier: "Pembekal Baru",
-                invoiceNo: "INV-001",
-                description: "Description baru",
-                amount: 0
+                supplier: supplier,
+                invoiceNo: invoiceNo || "INV-NEW",
+                description: description || "Description",
+                amount: amount
             });
-            refreshTable();
+            
+            renderTable();
             refreshSupplierList();
-            updateStatus(`✅ Row baru ditambah. Klik pada cell untuk edit.`, "success");
+            closeAddRowForm();
+            updateStatus(`✅ Row baru ditambah: ${supplier} - ${invoiceNo} (RM ${formatNumber(amount)})`, "success");
+        }
+        
+        function refreshTable() {
+            renderTable();  // alias
+        }
+        
+        function deleteRow(id) {
+            deleteRowById(id);
         }
         
         function exportToExcel() {
@@ -590,32 +558,25 @@
                 updateStatus("⚠️ Tiada data untuk export.", "error");
                 return;
             }
-            
             const exportData = [["Perkara (B)", "No. Invoice (C)", "Pembekal (D)", "Jumlah (H)"]];
             rawData.forEach(item => {
                 exportData.push([item.description, item.invoiceNo, item.supplier, item.amount]);
             });
-            
             const ws = XLSX.utils.aoa_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-            
-            const fileName = `data_export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`;
-            XLSX.writeFile(wb, fileName);
-            updateStatus(`✅ Data dieksport ke ${fileName}`, "success");
+            XLSX.utils.book_append_sheet(wb, ws, "Data");
+            XLSX.writeFile(wb, `data_export_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
+            updateStatus(`✅ Data dieksport`, "success");
         }
 
         function refreshSupplierList() {
             suppliers = [...new Set(rawData.map(item => item.supplier))].sort();
-            
             const container = document.getElementById('supplierList');
             container.innerHTML = '';
-            
             if (suppliers.length === 0) {
                 container.innerHTML = '<p style="text-align: center; color: #999;">📂 Tiada pembekal</p>';
                 return;
             }
-            
             suppliers.forEach(supplier => {
                 const div = document.createElement('div');
                 div.className = 'supplier-item';
@@ -624,8 +585,6 @@
                 div.onclick = () => toggleSupplier(supplier, div);
                 container.appendChild(div);
             });
-            
-            updateStatus(`✅ ${suppliers.length} pembekal dijumpai.`, "success");
         }
 
         function toggleSupplier(supplier, element) {
@@ -652,139 +611,99 @@
         }
 
         function formatNumber(value) {
-            if (!value && value !== 0) return "0.00";
+            if (value === null || value === undefined) return "0.00";
             return parseFloat(value).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
         }
 
         function generateVoucherHTML(companyName, supplier, data, voucherDate) {
             let totalAmount = 0;
             let rowsHTML = '';
-            
             data.forEach((item, idx) => {
                 const amount = parseFloat(item.amount) || 0;
                 totalAmount += amount;
-                rowsHTML += `
-                    <tr>
-                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">${idx + 1}</td>
-                        <td style="border: 1px solid #000; padding: 8px;">${escapeHtml(item.invoiceNo)}</td>
-                        <td style="border: 1px solid #000; padding: 8px;">${escapeHtml(item.description)}</td>
-                        <td style="border: 1px solid #000; padding: 8px; text-align: right;">${formatNumber(amount)}</td>
-                    </tr>
-                `;
+                rowsHTML += `<tr>
+                    <td style="border:1px solid #000;padding:8px;text-align:center;">${idx+1}</td>
+                    <td style="border:1px solid #000;padding:8px;">${escapeHtml(item.invoiceNo)}</td>
+                    <td style="border:1px solid #000;padding:8px;">${escapeHtml(item.description)}</td>
+                    <td style="border:1px solid #000;padding:8px;text-align:right;">${formatNumber(amount)}</td>
+                </tr>`;
             });
-            
-            return `
-                <div class="voucher">
-                    <div class="voucher-header">
-                        <h1>PAYMENT VOUCHER</h1>
-                    </div>
-                    <div class="voucher-info">
-                        <div class="info-row"><span class="info-label">Nama Cawangan:</span> <span>${escapeHtml(companyName)}</span></div>
-                        <div class="info-row"><span class="info-label">Supplier:</span> <span>${escapeHtml(supplier)}</span></div>
-                        <div class="info-row"><span class="info-label">Tarikh:</span> <span>${voucherDate}</span></div>
-                    </div>
-                    <table class="voucher-table">
-                        <thead><tr><th>Bil.</th><th>No. Invoice</th><th>Perkara</th><th>Jumlah (RM)</th></tr></thead>
-                        <tbody>${rowsHTML}</tbody>
-                        <tfoot><tr><td colspan="3" style="text-align: right; font-weight: bold;">JUMLAH:</td><td style="text-align: right; font-weight: bold;">${formatNumber(totalAmount)}</td></tr>
-                    </tfoot>
-                </table>
-                    <div class="voucher-footer">
-                        <p>Disediakan oleh: _________________________</p>
-                        <p>*** Voucher ini dijana secara automatik ***</p>
-                        <p style="font-size: 8px;">Tiada header/footer semasa print - voucher bersih</p>
-                    </div>
+            return `<div class="voucher">
+                <div class="voucher-header"><h1>PAYMENT VOUCHER</h1></div>
+                <div class="voucher-info">
+                    <div class="info-row"><span class="info-label">Nama Cawangan:</span> ${escapeHtml(companyName)}</div>
+                    <div class="info-row"><span class="info-label">Supplier:</span> ${escapeHtml(supplier)}</div>
+                    <div class="info-row"><span class="info-label">Tarikh:</span> ${voucherDate}</div>
                 </div>
-            `;
+                <table class="voucher-table">
+                    <thead><tr><th>Bil.</th><th>No. Invoice</th><th>Perkara</th><th>Jumlah (RM)</th></tr></thead>
+                    <tbody>${rowsHTML}</tbody>
+                    <tfoot><tr><td colspan="3" style="text-align:right;font-weight:bold;">JUMLAH:</td><td style="text-align:right;font-weight:bold;">${formatNumber(totalAmount)}</td></tr></tfoot>
+                </table>
+                <div class="voucher-footer"><p>Disediakan oleh: _________________________</p><p>*** Voucher Auto Generated ***</p></div>
+            </div>`;
         }
 
         function generateAndShowVouchers() {
-            if (rawData.length === 0) {
-                updateStatus("⚠️ Sila muat naik fail data atau tambah row terlebih dahulu.", "error");
-                return;
-            }
-            
-            if (selectedSuppliers.size === 0) {
-                updateStatus("⚠️ Sila pilih sekurang-kurangnya satu pembekal.", "error");
-                return;
-            }
-            
+            if (rawData.length === 0) { updateStatus("⚠️ Sila muat naik fail data atau tambah row.", "error"); return; }
+            if (selectedSuppliers.size === 0) { updateStatus("⚠️ Sila pilih sekurang-kurangnya satu pembekal.", "error"); return; }
             const companyName = document.getElementById('companyName').value;
-            if (!companyName) {
-                updateStatus("⚠️ Sila masukkan Nama Cawangan.", "error");
-                return;
-            }
-            
+            if (!companyName) { updateStatus("⚠️ Sila masukkan Nama Cawangan.", "error"); return; }
             let voucherDate = document.getElementById('voucherDate').value;
-            if (!voucherDate) {
-                const today = new Date();
-                voucherDate = today.toLocaleDateString('en-MY');
-            } else {
-                voucherDate = voucherDate.split('-').reverse().join('/');
-            }
+            if (!voucherDate) voucherDate = new Date().toLocaleDateString('en-MY');
+            else voucherDate = voucherDate.split('-').reverse().join('/');
             
-            updateStatus("⏳ Sedang menjana voucher...", "info");
-            
-            try {
-                const selectedArray = Array.from(selectedSuppliers);
-                let allVouchersHTML = '';
-                let voucherCount = 0;
-                
-                for (const supplier of selectedArray) {
-                    const supplierData = rawData.filter(item => item.supplier === supplier);
-                    if (supplierData.length > 0) {
-                        const voucherHTML = generateVoucherHTML(companyName, supplier, supplierData, voucherDate);
-                        allVouchersHTML += voucherHTML;
-                        if (voucherCount < selectedArray.length - 1) {
-                            allVouchersHTML += '<div style="page-break-before: always;"></div>';
-                        }
-                        voucherCount++;
-                    }
+            const selectedArray = Array.from(selectedSuppliers);
+            let allVouchersHTML = '';
+            let count = 0;
+            for (const supplier of selectedArray) {
+                const supplierData = rawData.filter(item => item.supplier === supplier);
+                if (supplierData.length) {
+                    allVouchersHTML += generateVoucherHTML(companyName, supplier, supplierData, voucherDate);
+                    if (count < selectedArray.length-1) allVouchersHTML += '<div style="page-break-before: always;"></div>';
+                    count++;
                 }
-                
-                document.getElementById('voucherContent').innerHTML = allVouchersHTML;
-                document.getElementById('voucherModal').style.display = 'block';
-                updateStatus(`✅ ${voucherCount} voucher berjaya dijana. Apabila print, header/footer web akan hilang sepenuhnya.`, "success");
-                
-            } catch (error) {
-                updateStatus(`❌ GAGAL: ${error.message}`, "error");
             }
-        }
-
-        function generateAndPrintVouchers() {
-            generateAndShowVouchers();
-            setTimeout(() => { printVoucher(); }, 500);
-        }
-
-        function printVoucher() { 
-            window.print(); 
+            document.getElementById('voucherContent').innerHTML = allVouchersHTML;
+            document.getElementById('voucherModal').style.display = 'block';
+            updateStatus(`✅ ${count} voucher dijana.`, "success");
         }
         
-        function closeVoucher() { 
-            document.getElementById('voucherModal').style.display = 'none'; 
-        }
-
-        function updateStatus(message, type) {
+        function generateAndPrintVouchers() { generateAndShowVouchers(); setTimeout(() => printVoucher(), 500); }
+        function printVoucher() { window.print(); }
+        function closeVoucher() { document.getElementById('voucherModal').style.display = 'none'; }
+        function updateStatus(msg, type) { 
             const statusDiv = document.getElementById('status');
             statusDiv.className = `status status-${type}`;
-            statusDiv.innerHTML = message;
+            statusDiv.innerHTML = msg;
         }
-
+        
         function clearAll() {
             rawData = [];
             suppliers = [];
             selectedSuppliers.clear();
             document.getElementById('dataFile').value = '';
-            document.getElementById('supplierList').innerHTML = '<p style="text-align: center; color: #999;">📂 Muat naik fail data terlebih dahulu</p>';
-            document.getElementById('editableTableContainer').innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">📂 Muat naik fail data untuk mula edit</p>';
+            renderTable();
+            refreshSupplierList();
             document.getElementById('companyName').value = 'RPS PHARMACY';
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('voucherDate').value = today;
-            updateStatus("✅ Semua telah dibersihkan.", "info");
+            document.getElementById('voucherDate').value = new Date().toISOString().split('T')[0];
+            updateStatus("✅ Semua data dibersihkan.", "info");
+            closeAddRowForm();
         }
-
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('voucherDate').value = today;
+        
+        // Initialize
+        document.getElementById('voucherDate').value = new Date().toISOString().split('T')[0];
+        renderTable();
     </script>
 </body>
 </html>
